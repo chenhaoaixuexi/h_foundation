@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_easyloading: ^3.0.5
+  logger:
+  logger_flutter_viewer: ^0.8.0
   get:
 
 dev_dependencies:
