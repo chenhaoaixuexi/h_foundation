@@ -1,6 +1,6 @@
 // EasyShorcutsWidget 扩展 .shortcuts
 import 'package:flutter/widgets.dart';
-import 'package:h_foundation/src/extension.obj.dart';
+import 'package:h_foundation/src/extension/extension.obj.dart';
 
 extension WidgetExt on Widget {
   //Column
