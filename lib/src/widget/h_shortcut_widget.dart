@@ -144,7 +144,7 @@ class CustomIntentWithAction extends Intent {
   final String key;
   final Future<void> Function(BuildContext context, CustomIntentWithAction intent) func;
 
-  CustomIntentWithAction(this.key, this.func,{this.data});
+  CustomIntentWithAction(this.func, {this.key = "", this.data});
 }
 
 class EasyShorcutsWidget extends StatelessWidget {
