@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:logger_flutter_viewer/logger_flutter_viewer.dart';
 
@@ -21,5 +22,10 @@ class ScreenOutput extends LogOutput {
   void output(OutputEvent event) {
     consoleOutput.output(event);
     LogConsole.output(event);
+  }
+}
+extension LoggerExt on Logger{
+  void dd(dynamic Function() msgSupplier, [dynamic error, StackTrace? stackTrace]) {
+    if (kDebugMode) logger.d(msgSupplier(), error, stackTrace);
   }
 }
