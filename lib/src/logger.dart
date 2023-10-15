@@ -11,7 +11,8 @@ Logger logger = Logger(
       lineLength: 120, // Width of the output
       colors: true, // Colorful log messages
       printEmojis: true, // Print an emoji for each log message
-      printTime: false // Should each log print contain a timestamp
+      printTime: false, // Should each log print contain a timestamp
+      excludePaths: ["package:h_foundation/src/logger.dart"]
   ),
 );
 
