@@ -197,6 +197,7 @@ class MyFocusableActionWidget<T extends Intent> extends StatelessWidget {
   FocusableActionDetector buildFocusableActionDetector(BuildContext context) {
     return FocusableActionDetector(
       onFocusChange: (bool focus) {
+        debugPrint("this:${this.toString()},focus:${focus}");
         onFocusChange?.call(focus, this);
       },
       autofocus: true, // 没有这个 flutter 在 mac 端直接异常了, 起不来
@@ -207,6 +208,7 @@ class MyFocusableActionWidget<T extends Intent> extends StatelessWidget {
           var res = onRawKeyEvent?.call(node, event) ?? KeyEventResult.ignored;
           if (event.isMetaPressed && (event.character ?? "") != "") {
             //todo 还没修好
+            debugPrint("fix meta key bug");
             SchedulerBinding.instance.addPostFrameCallback((_) {
               // ignore: invalid_use_of_visible_for_testing_member
               RawKeyboard.instance.clearKeysPressed();

@@ -1,4 +1,6 @@
 // 模仿 kotlin 实现 let、also、apply、run、with、takeIf、takeUnless
+import 'dart:convert';
+
 extension ObjectExtensions<T> on T {
   R map<R>(R mapper(T val)) {
     return mapper(this);
@@ -25,6 +27,10 @@ extension ObjectExtensions<T> on T {
       return this;
     }
     return null;
+  }
+
+  String toJsonStr() {
+    return json.encode(this);
   }
 }
 

@@ -1,18 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:h_foundation/h_foundation.dart';
-import 'package:h_foundation/src/logger.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:overlayment/overlayment.dart';
 
-import 'global_conf.dart';
-
 void $assert(bool condition, [String msg = ""]) {
   // 具有更多的可配置项
-  if(!condition){
+  if (!condition) {
     logger.e(msg);
     _showError(msg);
   }
@@ -20,19 +18,39 @@ void $assert(bool condition, [String msg = ""]) {
   //todo 缺上报给指定平台
 }
 
+Future<void> $assertFFn(Future<bool> Function() condition, [String msg = ""]) async {
+  var condi = await condition();
+  return $assertFn(() => condi, msg);
+}
+
+@pragma('vm:prefer-inline')
+Future<void> $assertFn(FutureOr<bool> Function() condition, [String msg = "", String Function()? append]) async {
+  // 具有更多的可配置项
+  //todo 性能优化
+  final c = await condition();
+  var msgA = '${msg} ${append?.call()})';
+  if (!c && !kDebugMode) {
+    logger.e(msgA, "", StackTrace.current);
+    _showError(msgA);
+  }
+  assert(c, "${msgA}");
+  //todo 缺上报给指定平台
+}
+
 void _showError(String msg) {
   Get.to(() => _myErrorsHandler.defaultErrorWidgetBuilder(FlutterErrorDetails(exception: Exception(msg))));
 }
 
-void ensureDebug(){
+void ensureDebug() {
   Get.put(DebugUtils());
   RawKeyboard.instance.addListener((value) {
-    if(kDebugKeyboard) {
+    if (kDebugKeyboard) {
       logger.d("[RawKeyboard]value: $value");
     }
   });
   logger.d("ensureDebug");
 }
+
 ensureErrorHandlePrepare() async {
   await _myErrorsHandler.initialize();
   FlutterError.onError = (details) {
@@ -46,18 +64,19 @@ ensureErrorHandlePrepare() async {
   };
   ErrorWidget.builder = _myErrorsHandler.defaultErrorWidgetBuilder;
 }
+
 var _myErrorsHandler = MyErrorsHandler(ErrorWidget.builder);
-class MyErrorsHandler{
+
+class MyErrorsHandler {
   MyErrorsHandler(this._defaultBuilder);
   final ErrorWidgetBuilder _defaultBuilder;
 
-  initialize() async {
-
-  }
-  onError(Object exception, StackTrace stackTrace){
+  initialize() async {}
+  onError(Object exception, StackTrace stackTrace) {
     _showError("${exception}\n ${stackTrace}");
   }
-  onErrorDetails(FlutterErrorDetails details){
+
+  onErrorDetails(FlutterErrorDetails details) {
     _showError("${details.exception}\n${details.stack}");
   }
 
@@ -72,8 +91,7 @@ class MyErrorsHandler{
               border: InputBorder.none,
               hintStyle: TextStyle(fontSize: 14, color: Colors.grey.shade400),
               contentPadding: const EdgeInsets.only(left: 20, right: 20, top: 8 * 3, bottom: 8)),
-        )
-    );
+        ));
   }
 }
 
@@ -149,36 +167,36 @@ class DebugUtils extends GetxService {
 }
 
 extension DebugUtilsEx on DebugUtils {
-  addLabel(Rx<dynamic> label,Rx<dynamic> title) {
+  addLabel(Rx<dynamic> label, Rx<dynamic> title) {
     _supplier.add(() => Obx(() => Text("${label.value.toString()}: ${title.value.toString()}")));
   }
 
   // add check box
-  addCheckBox(Rx<String> label,Rx<bool> value ) {
+  addCheckBox(Rx<String> label, Rx<bool> value) {
     _supplier.add(() => Obx(() {
-      var list = [
-        Text(label.value),
-        Checkbox(
-            value: value.value,
-            onChanged: (bool? v) {
-              v?.let((it) => value.value = it);
-            })
-      ];
-      return Row(children: list);
-    }));
+          var list = [
+            Text(label.value),
+            Checkbox(
+                value: value.value,
+                onChanged: (bool? v) {
+                  v?.let((it) => value.value = it);
+                })
+          ];
+          return Row(children: list);
+        }));
   }
 
   // add TextEditor
   addTextField(Rx<String> label, Rx<String> value) {
     _supplier.add(
-          () => Obx(
-            () {
+      () => Obx(
+        () {
           var list = [
             Text(label.value),
             TextField(
               maxLines: 1,
               controller: TextEditingController(text: value.value),
-              decoration : InputDecoration(constraints: BoxConstraints.tightFor(height: 42,width: 400)),
+              decoration: InputDecoration(constraints: BoxConstraints.tightFor(height: 42, width: 400)),
               onChanged: (String? v) {
                 v?.let((it) => value.value = it);
               },
