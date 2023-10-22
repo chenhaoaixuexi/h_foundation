@@ -1,8 +1,20 @@
 // EasyShorcutsWidget 扩展 .shortcuts
 import 'package:flutter/widgets.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:h_foundation/src/extension/extension.obj.dart';
 
 extension WidgetExt on Widget {
+  Widget constrained(BoxConstraints constraints) {
+    return ConstrainedBox(
+      constraints: constraints,
+      child: this,
+    );
+  }
+
+  Widget obx() {
+    return Obx(() => this);
+  }
+
   //Column
   Widget Col({
     key,
@@ -21,7 +33,7 @@ extension WidgetExt on Widget {
       verticalDirection: verticalDirection,
       textBaseline: textBaseline,
       children: [this].apply((it) {
-        if(children!=null) it.addAll(children);
+        if (children != null) it.addAll(children);
       }),
     );
   }
@@ -76,10 +88,7 @@ extension WidgetExt on Widget {
     );
   }
 
-  Widget easyTap(
-      {VoidCallback? onTap,
-        VoidCallback? onDoubleTap,
-        VoidCallback? onLongPress}) {
+  Widget easyTap({VoidCallback? onTap, VoidCallback? onDoubleTap, VoidCallback? onLongPress}) {
     return GestureDetector(
       onTap: onTap,
       onDoubleTap: onDoubleTap,
