@@ -24,16 +24,22 @@ Future<void> $assertFFn(Future<bool> Function() condition, [String msg = ""]) as
 }
 
 @pragma('vm:prefer-inline')
-Future<void> $assertFn(FutureOr<bool> Function() condition, [String msg = "", String Function()? append]) async {
+Future<void> $assertFn(
+  FutureOr<bool> Function() condition,
+  String msg, {
+  String Function()? append,
+  StackTrace? stack,
+  bool block = false, //todo 待完善
+}) async {
   // 具有更多的可配置项
   //todo 性能优化
   final c = await condition();
   var msgA = '${msg} ${append?.call()})';
   if (!c && !kDebugMode) {
-    logger.e(msgA, "", StackTrace.current);
+    logger.e(msgA, "", stack ?? StackTrace.current);
     _showError(msgA);
   }
-  assert(c, "${msgA}");
+  assert(c, "${msgA}\n $stack");
   //todo 缺上报给指定平台
 }
 

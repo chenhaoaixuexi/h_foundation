@@ -21,7 +21,7 @@ void wtoast(String msg) {
 
 //todo 改为 hive
 late final SharedPreferences prefs;
-ensureKVStore() async{
+ensureKVStore() async {
   // Obtain shared preferences.
   prefs = await SharedPreferences.getInstance();
   logger.d("[ensureKVStore] SharedPreferences.getInstance();");
