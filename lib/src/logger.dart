@@ -16,6 +16,12 @@ Logger logger = Logger(
       ),
 );
 
+extension LoggerExt on Object {
+  LoggerWrapper get log {
+    return LoggerWrapper(logger, this.runtimeType.toString());
+  }
+}
+
 class LoggerWrapper {
   final Logger _logger;
   final String prefix;
