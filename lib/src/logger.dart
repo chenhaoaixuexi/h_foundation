@@ -16,6 +16,37 @@ Logger logger = Logger(
       ),
 );
 
+class LoggerWrapper {
+  final Logger _logger;
+  final String prefix;
+
+  const LoggerWrapper(this._logger, this.prefix);
+
+  bool _shouldDebugLog() {
+    return _level.index <= Level.debug.index;
+  }
+
+  void dd(String Function() supplier) {
+    if (_shouldDebugLog()) print("👋👋👋[${prefix}]: ${supplier()}");
+  }
+
+  void df(Future<String> Function() supplier) async {
+    if (_shouldDebugLog()) print("👋👋👋[${prefix}]: ${await supplier()}");
+  }
+
+  void di(String Function() supplier) {
+    if (_shouldDebugLog()) print(">>> [${prefix}]: ${supplier()}");
+  }
+
+  void td(String Function() supplier) {
+    if (_shouldDebugLog()) print("还没实现[todo][${prefix}] : ${supplier()}");
+  }
+
+  void e(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    logger.e(message, error, stackTrace);
+  }
+}
+
 // shake 未完全 要包一层
 class ScreenOutput extends LogOutput {
   final ConsoleOutput consoleOutput = ConsoleOutput();
@@ -26,24 +57,8 @@ class ScreenOutput extends LogOutput {
   }
 }
 
-bool _shouldDebugLog() {
-  return _level.index <= Level.debug.index;
-}
-
 extension LoggerEx on Logger {
-  void dd(String Function() supplier) {
-    if (_shouldDebugLog()) print("👋👋👋: ${supplier()}");
-  }
-
-  void df(Future<String> Function() supplier) async {
-    if (_shouldDebugLog()) print("👋👋👋: ${await supplier()}");
-  }
-
-  void di(String Function() supplier) {
-    if (_shouldDebugLog()) print(">>> : ${supplier()}");
-  }
-
-  void td(String Function() supplier) {
-    if (_shouldDebugLog()) print("还没实现[todo] : ${supplier()}");
+  LoggerWrapper wrap(Object obj, [String? key]) {
+    return LoggerWrapper(logger, obj.runtimeType.toString() + (key ?? ""));
   }
 }

@@ -1,9 +1,82 @@
 // EasyShorcutsWidget 扩展 .shortcuts
 import 'package:flutter/widgets.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:get/get.dart';
 import 'package:h_foundation/src/extension/extension.obj.dart';
 
 extension WidgetExt on Widget {
+  Widget ignorePointer({bool ignoring = true}) {
+    return IgnorePointer(
+      ignoring: ignoring,
+      child: this,
+    );
+  }
+
+  Widget withRx<T>(RxObjectMixin<T> rx) {
+    rx.value;
+    return this;
+  }
+
+  Widget cover(Widget widget) {
+    return widget;
+  }
+
+  Widget container({
+    Color? color,
+    Decoration? decoration,
+    double? width,
+    double? height,
+    EdgeInsetsGeometry? padding,
+  }) {
+    return Container(
+      color: color,
+      decoration: decoration,
+      width: width,
+      height: height,
+      padding: padding,
+      child: this,
+    );
+  }
+
+  Widget expand({int? flex}) {
+    return Expanded(
+      flex: flex ?? 1,
+      child: this,
+    );
+  }
+
+  // safeArea
+  Widget safeArea({
+    bool top = true,
+    bool bottom = true,
+    bool left = true,
+    bool right = true,
+  }) {
+    return SafeArea(
+      top: top,
+      bottom: bottom,
+      left: left,
+      right: right,
+      child: this,
+    );
+  }
+
+  Widget boxConstraints({
+    double? minWidth,
+    double? maxWidth,
+    double? minHeight,
+    double? maxHeight,
+  }) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minWidth: minWidth ?? 0.0,
+        maxWidth: maxWidth ?? double.infinity,
+        minHeight: minHeight ?? 0.0,
+        maxHeight: maxHeight ?? double.infinity,
+      ),
+      child: this,
+    );
+  }
+
   Widget constrained(BoxConstraints constraints) {
     return ConstrainedBox(
       constraints: constraints,
@@ -11,8 +84,28 @@ extension WidgetExt on Widget {
     );
   }
 
-  Widget obx() {
-    return Obx(() => this);
+  Widget limitBox({
+    double? maxWidth,
+    double? maxHeight,
+  }) {
+    return LimitedBox(
+      maxWidth: maxWidth ?? double.infinity,
+      maxHeight: maxHeight ?? double.infinity,
+      child: this,
+    );
+  }
+
+  Widget align({
+    AlignmentGeometry alignment = Alignment.center,
+    double? widthFactor,
+    double? heightFactor,
+  }) {
+    return Align(
+      alignment: alignment,
+      widthFactor: widthFactor,
+      heightFactor: heightFactor,
+      child: this,
+    );
   }
 
   //Column
