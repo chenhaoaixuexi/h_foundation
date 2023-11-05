@@ -48,13 +48,12 @@ void _showError(String msg) {
 }
 
 void ensureDebug() {
-  Get.put(DebugUtils());
+  Get.put(DebugUtils._());
   RawKeyboard.instance.addListener((value) {
     if (kDebugKeyboard) {
-      logger.d("[RawKeyboard]value: $value");
+      logger.wrap("ensureDebug").dd(() => "[RawKeyboard]value: $value");
     }
   });
-  logger.d("ensureDebug");
 }
 
 ensureErrorHandlePrepare() async {
@@ -102,37 +101,39 @@ class MyErrorsHandler {
 }
 
 class DebugUtils extends GetxService {
+  DebugUtils._();
   static DebugUtils get instance => Get.find<DebugUtils>();
-  final RxList<Widget Function()> _supplier = RxList();
+  final RxList<Widget Function()> supplier = RxList();
   final List<Widget> _debugWindowList = [];
-  final show = RxBool(prefs.getBool("DebugUtils.show") ?? false).apply((it) {
-    it.listen((p0) {
-      prefs.setBool("DebugUtils.show", p0);
-    });
-  });
+  final show = RxBool(false);
 
   final RxInt _hintUpdate = RxInt(0);
   final String _debugWindowName = "DEBUG_WINDOW";
 
   OverWindow _debugWindow() {
     return OverWindow(
-        name: _debugWindowName,
-        position: const Offset(50, 50),
-        canMove: true,
-        color: Colors.transparent,
-        animation: const OverFadeAnimation(durationMilliseconds: 10, reverseDurationMilliseconds: 10, child: OverScaleAnimation()),
-        backgroundSettings: BackgroundSettings.transparent(false),
-        child: Obx(() {
-          _hintUpdate.value;
-          // todo 宽高 布局约束 学习
-          var list = ListView(children: _debugWindowList);
-          var size = Get.context?.size ?? const Size(400, 600);
-          return ConstrainedBox(
-            constraints: BoxConstraints(minHeight: 0, minWidth: 0, maxWidth: size.width * 0.8, maxHeight: size.height * 0.8),
-            child: list,
-          );
-        })).apply((it) {
+            name: _debugWindowName,
+            position: const Offset(50, 50),
+            canMove: true,
+            color: Colors.transparent,
+            animation: const OverFadeAnimation(durationMilliseconds: 10, reverseDurationMilliseconds: 10, child: OverScaleAnimation()),
+            backgroundSettings: BackgroundSettings.transparent(false),
+            child: _buildObx())
+        .apply((it) {
       Overlayment.navigationKey = Get.key;
+    });
+  }
+
+  Widget _buildObx() {
+    return Obx(() {
+      _hintUpdate.value;
+      // todo 宽高 布局约束 学习
+      var list = ListView(children: _debugWindowList);
+      var size = Size(Get.width, Get.height);
+      return ConstrainedBox(
+        constraints: BoxConstraints(minHeight: 0, minWidth: 0, maxWidth: size.width * 0.8, maxHeight: size.height * 0.8),
+        child: list,
+      );
     });
   }
 
@@ -141,14 +142,15 @@ class DebugUtils extends GetxService {
     super.onInit();
     show.listen((p0) async {
       await _show(p0);
-      _supplier.refresh();
+      supplier.refresh();
     });
-    _supplier.listen((p0) {
+    supplier.listen((p0) {
       var list = p0.map((e) => e());
       _debugWindowList.clear();
       _debugWindowList.addAll(list);
       _hintUpdate.value++;
     });
+    if (GetPlatform.isMobile) return;
     //DebugUtils.instance.show.toggle();
     hotKeyManager.register(
         HotKey(
@@ -174,12 +176,12 @@ class DebugUtils extends GetxService {
 
 extension DebugUtilsEx on DebugUtils {
   addLabel(Rx<dynamic> label, Rx<dynamic> title) {
-    _supplier.add(() => Obx(() => Text("${label.value.toString()}: ${title.value.toString()}")));
+    supplier.add(() => Obx(() => Text("${label.value.toString()}: ${title.value.toString()}")));
   }
 
   // add check box
   addCheckBox(Rx<String> label, Rx<bool> value) {
-    _supplier.add(() => Obx(() {
+    supplier.add(() => Obx(() {
           var list = [
             Text(label.value),
             Checkbox(
@@ -194,15 +196,13 @@ extension DebugUtilsEx on DebugUtils {
 
   // add TextEditor
   addTextField(Rx<String> label, Rx<String> value) {
-    _supplier.add(
+    supplier.add(
       () => Obx(
         () {
           var list = [
             Text(label.value),
             TextField(
-              maxLines: 1,
               controller: TextEditingController(text: value.value),
-              decoration: InputDecoration(constraints: BoxConstraints.tightFor(height: 42, width: 400)),
               onChanged: (String? v) {
                 v?.let((it) => value.value = it);
               },
