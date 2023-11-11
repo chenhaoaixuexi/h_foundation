@@ -29,7 +29,7 @@ Future<void> fnassert(
 }
 
 void _showError(String msg) {
-  Get.to(() => _myErrorsHandler.defaultErrorWidgetBuilder(FlutterErrorDetails(exception: Exception(msg))));
+  Get.to(() => _myErrorsHandler.defaultErrorWidgetBuilder(FlutterErrorDetails(exception: Exception(msg))), routeName: msg,);
 }
 
 void ensureDebug() {
