@@ -159,14 +159,6 @@ extension WidgetExt on Widget {
     );
   }
 
-  // Opacity
-  Widget opacity(double opacity) {
-    return Opacity(
-      opacity: opacity,
-      child: this,
-    );
-  }
-
   // safeArea
   Widget safeArea({
     bool top = true,
