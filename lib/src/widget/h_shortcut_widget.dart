@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:h_foundation/h_foundation.dart';
 import 'package:get/get.dart';
+import 'package:h_foundation/h_foundation.dart';
 
 /*DEMO
 KeyboardBindingWidget _test_buildKeyboardBindingWidget(
@@ -74,11 +76,19 @@ final meta_9 = LogicalKeySet(
   LogicalKeyboardKey.meta, // Replace with control on Windows
   LogicalKeyboardKey.digit9,
 );
+
 // EasyShorcutsWidget 扩展 .shortcuts
 extension EasyShorcutsWidgetExt on Widget {
   // .shortcuts
-  Widget easyShortcuts(
-      {Map<LogicalKeySet, CustomIntentWithAction>? intentSet}) {
+
+  Widget simpleShortcuts(LogicalKeySet keySet, Function function) {
+    return EasyShorcutsWidget(
+      intentSet: {keySet: CustomIntentWithAction((_, __) => Future(() => function()))},
+      child: this,
+    );
+  }
+
+  Widget easyShortcuts({Map<LogicalKeySet, CustomIntentWithAction>? intentSet}) {
     return EasyShorcutsWidget(
       intentSet: intentSet,
       child: this,
@@ -142,7 +152,7 @@ class CustomIntent extends Intent {
 class CustomIntentWithAction extends Intent {
   final dynamic data;
   final String key;
-  final Future<void> Function(BuildContext context, CustomIntentWithAction intent) func;
+  final FutureOr<void> Function(BuildContext context, CustomIntentWithAction intent) func;
 
   CustomIntentWithAction(this.func, {this.key = "", this.data});
 }
@@ -161,9 +171,9 @@ class EasyShorcutsWidget extends StatelessWidget {
         intent.func.call(context, intent);
       },
       focusNode: FocusNode(skipTraversal: true),
-      child: child,);
+      child: child,
+    );
   }
-
 }
 
 class MyFocusableActionWidget<T extends Intent> extends StatelessWidget {
@@ -202,9 +212,9 @@ class MyFocusableActionWidget<T extends Intent> extends StatelessWidget {
       },
       autofocus: true, // 没有这个 flutter 在 mac 端直接异常了, 起不来
       focusNode: (focusNode ?? FocusNode()).apply((p0) {
-        p0.skipTraversal= true; // FocusableActionDetector 自己不在 focus 变化序列里
+        p0.skipTraversal = true; // FocusableActionDetector 自己不在 focus 变化序列里
         p0.onKeyEvent = this.onKeyEvent;
-        p0.onKey = (FocusNode node, RawKeyEvent event){
+        p0.onKey = (FocusNode node, RawKeyEvent event) {
           var res = onRawKeyEvent?.call(node, event) ?? KeyEventResult.ignored;
           if (event.isMetaPressed && (event.character ?? "") != "") {
             //todo 还没修好

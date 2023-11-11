@@ -1,12 +1,127 @@
 // EasyShorcutsWidget 扩展 .shortcuts
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart' hide Hero, CreateRectTween, HeroPlaceholderBuilder, HeroFlightShuttleBuilder;
 import 'package:get/get.dart';
 import 'package:h_foundation/src/extension/extension.obj.dart';
+import 'package:h_foundation/src/widget/fnheroes.dart';
+
+extension IconDataExt on IconData {
+  Icon asIcon({
+    double? size,
+    double? fill,
+    double? weight,
+    double? grade,
+    double? opticalSize,
+    Color? color,
+    List<Shadow>? shadows,
+    String? semanticLabel,
+    TextDirection? textDirection,
+  }) {
+    return Icon(
+      this,
+      grade: grade,
+      opticalSize: opticalSize,
+      size: size,
+      fill: fill,
+      shadows: shadows,
+      weight: weight,
+      color: color,
+      semanticLabel: semanticLabel,
+      textDirection: textDirection,
+    );
+  }
+}
 
 extension WidgetExt on Widget {
   Widget ignorePointer({bool ignoring = true}) {
     return IgnorePointer(
       ignoring: ignoring,
+      child: this,
+    );
+  }
+
+  // Transform.rotate
+  Widget rotate(double angle, {Offset origin = Offset.zero, AlignmentGeometry alignment = Alignment.center}) {
+    return Transform.rotate(
+      angle: angle,
+      origin: origin,
+      alignment: alignment,
+      child: this,
+    );
+  }
+
+  //tooltip
+  Widget tooltip(String message, {Key? key}) {
+    return Tooltip(
+      message: message,
+      key: key,
+      child: this,
+    );
+  }
+
+  Widget position({
+    double? top,
+    double? right,
+    double? bottom,
+    double? left,
+    double? width,
+    double? height,
+  }) {
+    return Positioned(
+      top: top,
+      right: right,
+      bottom: bottom,
+      left: left,
+      width: width,
+      height: height,
+      child: this,
+    );
+  }
+
+  // FittedBox
+  Widget fittedBox({
+    BoxFit fit = BoxFit.contain,
+    Alignment alignment = Alignment.center,
+    Clip clipBehavior = Clip.hardEdge,
+  }) {
+    return FittedBox(
+      fit: fit,
+      alignment: alignment,
+      clipBehavior: clipBehavior,
+      child: this,
+    );
+  }
+
+  Widget hero(
+    Object tag, {
+    Key? key,
+    CreateRectTween? createRectTween,
+    HeroFlightShuttleBuilder? flightShuttleBuilder,
+    HeroPlaceholderBuilder? placeholderBuilder,
+    bool transitionOnUserGestures = false,
+  }) {
+    return Hero(
+      key: key,
+      tag: tag,
+      createRectTween: createRectTween,
+      flightShuttleBuilder: flightShuttleBuilder,
+      placeholderBuilder: placeholderBuilder,
+      transitionOnUserGestures: transitionOnUserGestures,
+      child: this,
+    );
+  }
+
+// asScaffoldBody
+  Widget asScaffoldBody({bool? resizeToAvoidBottomInset}) {
+    return Scaffold(
+      body: this,
+      resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+    );
+  }
+
+  // opacity
+  Widget opacity(double opacity) {
+    return Opacity(
+      opacity: opacity,
       child: this,
     );
   }
@@ -85,7 +200,8 @@ extension WidgetExt on Widget {
     );
   }
 
-  Widget constrained(BoxConstraints constraints) {
+  Widget constrained(BoxConstraints? constraints) {
+    if (constraints == null) return this;
     return ConstrainedBox(
       constraints: constraints,
       child: this,
@@ -142,6 +258,16 @@ extension WidgetExt on Widget {
 // center
   Widget center() {
     return Center(child: this);
+  }
+
+  // LayoutBuilder
+  Widget layoutBuilder(Function(BoxConstraints) onConstraints) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        onConstraints.call(constraints);
+        return this;
+      },
+    );
   }
 
   // Focus

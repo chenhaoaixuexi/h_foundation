@@ -2,8 +2,17 @@
 import 'dart:convert';
 
 extension ObjectExtensions<T> on T {
-  R map<R>(R mapper(T val)) {
+  R fnmap<R>(R mapper(T val)) {
     return mapper(this);
+  }
+
+  Future<T> asFuture() {
+    return Future.value(this);
+  }
+
+  T addTo(List<T> iter) {
+    iter.add(this);
+    return this;
   }
 
   R let<R>(R Function(T it) block) => block(this);

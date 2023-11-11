@@ -8,24 +8,9 @@ import 'package:h_foundation/h_foundation.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:overlayment/overlayment.dart';
 
-void $assert(bool condition, [String msg = ""]) {
-  // 具有更多的可配置项
-  if (!condition) {
-    logger.e(msg);
-    _showError(msg);
-  }
-  assert(condition, msg);
-  //todo 缺上报给指定平台
-}
-
-Future<void> $assertFFn(Future<bool> Function() condition, [String msg = ""]) async {
-  var condi = await condition();
-  return $assertFn(() => condi, msg);
-}
-
 @pragma('vm:prefer-inline')
-Future<void> $assertFn(
-  FutureOr<bool> Function() condition,
+Future<void> fnassert(
+  FutureOr<bool> condition,
   String msg, {
   String Function()? append,
   StackTrace? stack,
@@ -33,7 +18,7 @@ Future<void> $assertFn(
 }) async {
   // 具有更多的可配置项
   //todo 性能优化
-  final c = await condition();
+  final c = await condition;
   var msgA = '${msg} ${append?.call()})';
   if (!c && !kDebugMode) {
     logger.e(msgA, "", stack ?? StackTrace.current);
@@ -48,12 +33,13 @@ void _showError(String msg) {
 }
 
 void ensureDebug() {
-  Get.put(DebugUtils._());
+  Get.put(DebugUtils());
   RawKeyboard.instance.addListener((value) {
     if (kDebugKeyboard) {
-      logger.wrap("ensureDebug").dd(() => "[RawKeyboard]value: $value");
+      logger.d("[RawKeyboard]value: $value");
     }
   });
+  logger.d("ensureDebug");
 }
 
 ensureErrorHandlePrepare() async {
@@ -101,39 +87,37 @@ class MyErrorsHandler {
 }
 
 class DebugUtils extends GetxService {
-  DebugUtils._();
   static DebugUtils get instance => Get.find<DebugUtils>();
-  final RxList<Widget Function()> supplier = RxList();
+  final RxList<Widget Function()> _supplier = RxList();
   final List<Widget> _debugWindowList = [];
-  final show = RxBool(false);
+  final show = RxBool(prefs.getBool("DebugUtils.show") ?? false).apply((it) {
+    it.listen((p0) {
+      prefs.setBool("DebugUtils.show", p0);
+    });
+  });
 
   final RxInt _hintUpdate = RxInt(0);
   final String _debugWindowName = "DEBUG_WINDOW";
 
   OverWindow _debugWindow() {
     return OverWindow(
-            name: _debugWindowName,
-            position: const Offset(50, 50),
-            canMove: true,
-            color: Colors.transparent,
-            animation: const OverFadeAnimation(durationMilliseconds: 10, reverseDurationMilliseconds: 10, child: OverScaleAnimation()),
-            backgroundSettings: BackgroundSettings.transparent(false),
-            child: _buildObx())
-        .apply((it) {
+        name: _debugWindowName,
+        position: const Offset(50, 50),
+        canMove: true,
+        color: Colors.transparent,
+        animation: const OverFadeAnimation(durationMilliseconds: 10, reverseDurationMilliseconds: 10, child: OverScaleAnimation()),
+        backgroundSettings: BackgroundSettings.transparent(false),
+        child: Obx(() {
+          _hintUpdate.value;
+          // todo 宽高 布局约束 学习
+          var list = ListView(children: _debugWindowList);
+          var size = Get.context?.size ?? const Size(400, 600);
+          return ConstrainedBox(
+            constraints: BoxConstraints(minHeight: 0, minWidth: 0, maxWidth: size.width * 0.8, maxHeight: size.height * 0.8),
+            child: list,
+          );
+        })).apply((it) {
       Overlayment.navigationKey = Get.key;
-    });
-  }
-
-  Widget _buildObx() {
-    return Obx(() {
-      _hintUpdate.value;
-      // todo 宽高 布局约束 学习
-      var list = ListView(children: _debugWindowList);
-      var size = Size(Get.width, Get.height);
-      return ConstrainedBox(
-        constraints: BoxConstraints(minHeight: 0, minWidth: 0, maxWidth: size.width * 0.8, maxHeight: size.height * 0.8),
-        child: list,
-      );
     });
   }
 
@@ -142,15 +126,14 @@ class DebugUtils extends GetxService {
     super.onInit();
     show.listen((p0) async {
       await _show(p0);
-      supplier.refresh();
+      _supplier.refresh();
     });
-    supplier.listen((p0) {
+    _supplier.listen((p0) {
       var list = p0.map((e) => e());
       _debugWindowList.clear();
       _debugWindowList.addAll(list);
       _hintUpdate.value++;
     });
-    if (GetPlatform.isMobile) return;
     //DebugUtils.instance.show.toggle();
     hotKeyManager.register(
         HotKey(
@@ -176,12 +159,12 @@ class DebugUtils extends GetxService {
 
 extension DebugUtilsEx on DebugUtils {
   addLabel(Rx<dynamic> label, Rx<dynamic> title) {
-    supplier.add(() => Obx(() => Text("${label.value.toString()}: ${title.value.toString()}")));
+    _supplier.add(() => Obx(() => Text("${label.value.toString()}: ${title.value.toString()}")));
   }
 
   // add check box
   addCheckBox(Rx<String> label, Rx<bool> value) {
-    supplier.add(() => Obx(() {
+    _supplier.add(() => Obx(() {
           var list = [
             Text(label.value),
             Checkbox(
@@ -196,13 +179,15 @@ extension DebugUtilsEx on DebugUtils {
 
   // add TextEditor
   addTextField(Rx<String> label, Rx<String> value) {
-    supplier.add(
+    _supplier.add(
       () => Obx(
         () {
           var list = [
             Text(label.value),
             TextField(
+              maxLines: 1,
               controller: TextEditingController(text: value.value),
+              decoration: InputDecoration(constraints: BoxConstraints.tightFor(height: 42, width: 400)),
               onChanged: (String? v) {
                 v?.let((it) => value.value = it);
               },
