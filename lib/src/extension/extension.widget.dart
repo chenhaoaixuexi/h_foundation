@@ -307,9 +307,10 @@ extension WidgetExt on Widget {
     );
   }
 
-  Widget easyTap({VoidCallback? onTap, VoidCallback? onDoubleTap, VoidCallback? onLongPress}) {
+  Widget easyTap({VoidCallback? onTap, VoidCallback? onDoubleTap, VoidCallback? onLongPress, GestureTapCallback? onSecondaryTap}) {
     return GestureDetector(
       onTap: onTap,
+      onSecondaryTap: onSecondaryTap,
       onDoubleTap: onDoubleTap,
       onLongPress: onLongPress,
       child: this,

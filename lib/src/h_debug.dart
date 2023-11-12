@@ -29,7 +29,12 @@ Future<void> fnassert(
 }
 
 void _showError(String msg) {
-  Get.to(() => _myErrorsHandler.defaultErrorWidgetBuilder(FlutterErrorDetails(exception: Exception(msg))), routeName: msg,);
+  Get.engine.addPostFrameCallback((timeStamp) {
+    Get.to(
+      () => _myErrorsHandler.defaultErrorWidgetBuilder(FlutterErrorDetails(exception: Exception(msg))),
+      routeName: msg,
+    );
+  });
 }
 
 void ensureDebug() {
