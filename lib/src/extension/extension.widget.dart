@@ -32,6 +32,14 @@ extension IconDataExt on IconData {
 }
 
 extension WidgetExt on Widget {
+  // AbsorbPointer
+  Widget absorbPointer({bool absorbing = true}) {
+    return AbsorbPointer(
+      absorbing: absorbing,
+      child: this,
+    );
+  }
+
   Widget ignorePointer({bool ignoring = true}) {
     return IgnorePointer(
       ignoring: ignoring,
