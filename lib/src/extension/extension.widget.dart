@@ -1,7 +1,6 @@
 // EasyShorcutsWidget 扩展 .shortcuts
 import 'package:flutter/material.dart' hide Hero, CreateRectTween, HeroPlaceholderBuilder, HeroFlightShuttleBuilder;
 import 'package:get/get.dart';
-import 'package:h_foundation/src/extension/extension.obj.dart';
 import 'package:h_foundation/src/widget/fnheroes.dart';
 
 extension IconDataExt on IconData {
@@ -32,7 +31,24 @@ extension IconDataExt on IconData {
 }
 
 extension WidgetExt on Widget {
-  // AbsorbPointer
+  // stack
+  Widget stack({
+    AlignmentGeometry alignment = AlignmentDirectional.topStart,
+    TextDirection? textDirection,
+    StackFit fit = StackFit.loose,
+    Clip clipBehavior = Clip.hardEdge,
+    required List<Widget> Function(Widget self) supplier,
+  }) {
+    return Stack(
+      alignment: alignment,
+      textDirection: textDirection,
+      fit: fit,
+      clipBehavior: clipBehavior,
+      children: supplier(this),
+    );
+  }
+
+  // absorbPointer
   Widget absorbPointer({bool absorbing = true}) {
     return AbsorbPointer(
       absorbing: absorbing,
@@ -233,15 +249,15 @@ extension WidgetExt on Widget {
   }
 
   //Column
-  Widget Col({
+  Widget colunm({
     key,
-    mainAxisAlignment,
-    required MainAxisSize mainAxisSize,
-    required CrossAxisAlignment crossAxisAlignment,
+    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
+    MainAxisSize mainAxisSize = MainAxisSize.max,
+    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.start,
     TextDirection? textDirection,
-    required VerticalDirection verticalDirection,
+    VerticalDirection verticalDirection = VerticalDirection.down,
     TextBaseline? textBaseline,
-    List<Widget>? children,
+    required List<Widget> Function(Widget self) supplier,
   }) {
     return Column(
       mainAxisSize: mainAxisSize,
@@ -249,9 +265,7 @@ extension WidgetExt on Widget {
       textDirection: textDirection,
       verticalDirection: verticalDirection,
       textBaseline: textBaseline,
-      children: [this].apply((it) {
-        if (children != null) it.addAll(children);
-      }),
+      children: supplier(this),
     );
   }
 
@@ -315,12 +329,12 @@ extension WidgetExt on Widget {
     );
   }
 
-  Widget easyTap({VoidCallback? onTap, VoidCallback? onDoubleTap, VoidCallback? onLongPress, GestureTapCallback? onSecondaryTap}) {
-    return GestureDetector(
+  Widget easyTap({VoidCallback? onTap, VoidCallback? onDoubleTap, VoidCallback? onLongPress, VoidCallback? onSecondaryTap}) {
+    return InkWell(
       onTap: onTap,
-      onSecondaryTap: onSecondaryTap,
       onDoubleTap: onDoubleTap,
       onLongPress: onLongPress,
+      onSecondaryTap: onSecondaryTap,
       child: this,
     );
   }

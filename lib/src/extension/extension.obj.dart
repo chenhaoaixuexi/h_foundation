@@ -41,6 +41,8 @@ extension ObjectExtensions<T> on T {
   String toJsonStr() {
     return json.encode(this);
   }
+
+  String get debugKey => "${this.runtimeType}_${this.hashCode}";
 }
 
 void main() {

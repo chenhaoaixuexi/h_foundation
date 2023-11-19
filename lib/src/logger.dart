@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:logger/logger.dart';
 import 'package:logger_flutter_viewer/logger_flutter_viewer.dart';
 
@@ -12,7 +14,7 @@ Logger logger = Logger(
       lineLength: 120, // Width of the output
       colors: true, // Colorful log messages
       printEmojis: true, // Print an emoji for each log message
-      printTime: false // Should each log print contain a timestamp
+      printTime: true // Should each log print contain a timestamp
       ),
 );
 
@@ -32,20 +34,16 @@ class LoggerWrapper {
     return _level.index <= Level.debug.index;
   }
 
-  void dd(String Function() supplier) {
-    if (_shouldDebugLog()) print("👋👋👋[${prefix}]: ${supplier()}");
-  }
-
-  void df(Future<String> Function() supplier) async {
-    if (_shouldDebugLog()) print("👋👋👋[${prefix}]: ${await supplier()}");
+  void dd(FutureOr<String> Function() supplier) async {
+    if (_shouldDebugLog()) print("[${DateTime.now()}]👋👋👋[${prefix}]: ${await supplier()}");
   }
 
   void di(String Function() supplier) {
-    if (_shouldDebugLog()) print(">>> [${prefix}]: ${supplier()}");
+    if (_shouldDebugLog()) print("[${DateTime.now()}]>>> [${prefix}]: ${supplier()}");
   }
 
   void td(String Function() supplier) {
-    if (_shouldDebugLog()) print("还没实现[todo][${prefix}] : ${supplier()}");
+    if (_shouldDebugLog()) print("[${DateTime.now()}] 还没实现[todo][${prefix}] : ${supplier()}");
   }
 
   void e(dynamic message, [dynamic error, StackTrace? stackTrace]) {

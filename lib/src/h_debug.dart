@@ -28,19 +28,8 @@ Future<void> fnassert(
   //todo 缺上报给指定平台
 }
 
-RxString _preError = RxString("");
-
 void _showError(String msg) {
-  if (kDebugMode) _preError.value += msg + "==========\n";
-  Get.engine.addPostFrameCallback((timeStamp) {
-    Get.to(
-      () => Obx(() {
-        return _myErrorsHandler.defaultErrorWidgetBuilder(
-          FlutterErrorDetails(exception: Exception(_preError.value)),
-        );
-      }),
-    );
-  });
+  Get.to(() => _myErrorsHandler.defaultErrorWidgetBuilder(FlutterErrorDetails(exception: Exception(msg))));
 }
 
 void ensureDebug() {
@@ -53,7 +42,7 @@ void ensureDebug() {
   logger.d("ensureDebug");
 }
 
-Future<void> ensureErrorHandlePrepare() async {
+ensureErrorHandlePrepare() async {
   await _myErrorsHandler.initialize();
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
@@ -73,12 +62,12 @@ class MyErrorsHandler {
   MyErrorsHandler(this._defaultBuilder);
   final ErrorWidgetBuilder _defaultBuilder;
 
-  Future<void> initialize() async {}
-  void onError(Object exception, StackTrace stackTrace) {
+  initialize() async {}
+  onError(Object exception, StackTrace stackTrace) {
     _showError("${exception}\n ${stackTrace}");
   }
 
-  void onErrorDetails(FlutterErrorDetails details) {
+  onErrorDetails(FlutterErrorDetails details) {
     _showError("${details.exception}\n${details.stack}");
   }
 
@@ -169,12 +158,12 @@ class DebugUtils extends GetxService {
 }
 
 extension DebugUtilsEx on DebugUtils {
-  void addLabel(Rx<dynamic> label, Rx<dynamic> title) {
+  addLabel(Rx<dynamic> label, Rx<dynamic> title) {
     _supplier.add(() => Obx(() => Text("${label.value.toString()}: ${title.value.toString()}")));
   }
 
   // add check box
-  void addCheckBox(Rx<String> label, Rx<bool> value) {
+  addCheckBox(Rx<String> label, Rx<bool> value) {
     _supplier.add(() => Obx(() {
           var list = [
             Text(label.value),
@@ -189,7 +178,7 @@ extension DebugUtilsEx on DebugUtils {
   }
 
   // add TextEditor
-  void addTextField(Rx<String> label, Rx<String> value) {
+  addTextField(Rx<String> label, Rx<String> value) {
     _supplier.add(
       () => Obx(
         () {
