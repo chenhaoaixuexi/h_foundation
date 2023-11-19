@@ -31,6 +31,11 @@ extension IconDataExt on IconData {
 }
 
 extension WidgetExt on Widget {
+  // TextFieldTapRegion
+  Widget textFieldTapRegion() {
+    return TextFieldTapRegion(child: this);
+  }
+
   // stack
   Widget stack({
     AlignmentGeometry alignment = AlignmentDirectional.topStart,
